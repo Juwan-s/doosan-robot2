@@ -952,12 +952,14 @@ def get_current_posx(ref=None):
             else:        
                 posx_info = _ros_Float64MultiArrayTolist(result.task_pos_info) # Convert Float64MultiArray to list
                 pos = []
+
+                # print("posx info:", posx_info)
                 for i in range(POINT_COUNT):
                     pos.append(posx_info[0][i])
-                    sol = int(round( posx_info[0][6] ))
+                    sol = int(round( posx_info[0][6]))
                     conv_posx = posx(pos)
 
-                    return conv_posx, sol
+                return conv_posx, sol # indent 구문이 이상해서 조정
     return 0
 
 def get_current_tool_flange_posx(ref=None):
@@ -6038,12 +6040,14 @@ class CDsrRobot:
                 else:        
                     posx_info = _ros_Float64MultiArrayTolist(result.task_pos_info) # Convert Float64MultiArray to list
                     pos = []
+
+                    # print("Debug")
                     for i in range(POINT_COUNT):
                         pos.append(posx_info[0][i])
-                        sol = int(round( posx_info[0][6] ))
+                        sol = int(round( posx_info[0][6]))
                         conv_posx = posx(pos)
 
-                        return conv_posx, sol
+                    return conv_posx, sol
         return 0
 
     def get_current_tool_flange_posx(self, ref=None):
