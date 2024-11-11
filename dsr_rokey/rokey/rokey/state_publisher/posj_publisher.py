@@ -8,7 +8,8 @@ ROBOT_MODEL = "m0609"
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
 
-
+import matplotlib
+matplotlib.use('Agg') 
 
 import rclpy
 
