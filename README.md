@@ -34,7 +34,7 @@ Install Docker https://docs.docker.com/engine/install/ubuntu/
     ### We recommand the /home/<user_home>/ros2_ws/src
     $ mkdir -p ~/ros2_ws/src
     $ cd ~/ros2_ws/src
-    $ git clone -b humble-devel https://github.com/doosan-robotics/doosan-robot2.git
+    $ git clone -b humble-devel https://github.com/Juwan-s/doosan-robot2.git
     $ git clone -b humble https://github.com/ros-controls/gz_ros2_control
     $ rosdep install -r --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
     $ cd ~/ros2_ws/src/doosan-robot2
