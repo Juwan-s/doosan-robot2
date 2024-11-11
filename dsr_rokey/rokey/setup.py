@@ -23,7 +23,8 @@ setup(
             "force_control = rokey.basic.force_control:main",
             "pick_and_place = rokey.basic.pick_and_place:main",
             "sorting = rokey.basic.sorting:main",
-            "cup_stack= rokey.basic.stacking:main"
+            "cup_stack= rokey.basic.stacking:main",
+            "tool_force = rokey.state_publisher.tool_force:main"
         ],
     },
 )
