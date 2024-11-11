@@ -31,6 +31,7 @@ def main(args=None):
             set_tcp,
             movej,
             movel,
+            get_current_posx,
             DR_FC_MOD_REL,
             DR_AXIS_Z,
             DR_BASE,
@@ -53,22 +54,34 @@ def main(args=None):
     set_accx(60, 40)
 
     while rclpy.ok():
-        set_tool("Tool Weight_2FG")
-        set_tcp("2FG_TCP")
+        # set_tool("Tool Weight_2FG")
+        # set_tcp("2FG_TCP")
 
-        # 초기 위치로 이동
-        movej(JReady, vel=VELOCITY, acc=ACC)
+        movej(JReady, v=30, a=30)
 
-        for i, pos in enumerate([pos1_u, pos2_u, pos3_u]):
-            movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
-            task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
-            set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
-            while not check_force_condition(DR_AXIS_Z, max=5):
-                pass
-            release_compliance_ctrl()
-            print(f"current position{i}: {get_desired_posx()}")
+        # movel(pos1_u, v=50, a=30)
 
-        movej(JReady, vel=VELOCITY, acc=ACC)
+        print('Move complete')
+        a = get_current_posx()
+
+        print()
+
+        print(a)
+        # # 초기 위치로 이동
+        # movej(JReady, vel=VELOCITY, acc=ACC)
+
+        # for i, pos in enumerate([pos1_u, pos2_u, pos3_u]):
+        #     movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
+        #     task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
+        #     set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
+        #     while not check_force_condition(DR_AXIS_Z, max=5):
+        #         pass
+        #     release_compliance_ctrl()
+        #     print(f"current position{i}: {get_desired_posx()}")
+
+        # movej(JReady, vel=VELOCITY, acc=ACC)
+
+        # [[496.05999755859375], 0, 0, 0, 0, 0], 2
 
         rclpy.shutdown()
 
