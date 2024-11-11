@@ -17,30 +17,31 @@ from std_msgs.msg import Float64MultiArray
 
 def main(args=None):
     rclpy.init(args=args)
-    node = rclpy.create_node("dsr_rokey_force_py", namespace=ROBOT_ID)
+    node = rclpy.create_node("dsr_rokey_posj_py", namespace=ROBOT_ID)
 
     DR_init.__dsr__node = node
 
     try:
-        from DSR_ROBOT2 import get_tool_force, set_velx, set_accx
+        from DSR_ROBOT2 import get_tool_force, set_velx, set_accx, get_current_posj
 
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
     
 
-    class ForceStatePublisher(Node):
+    class PosjStatePublisher(Node):
 
         def __init__(self):
-            super().__init__('force_state_publisher', namespace=ROBOT_ID)
-            self.publisher_ = self.create_publisher(Float64MultiArray, 'Force_State_Publisher', 10)
+            super().__init__('posj_publisher', namespace=ROBOT_ID)
+            self.publisher_ = self.create_publisher(Float64MultiArray, 'Posj_State_Publisher', 10)
             timer_period = 0.5  # seconds
             self.timer = self.create_timer(timer_period, self.timer_callback)
             self.i = 0
 
         def timer_callback(self):
             msg = Float64MultiArray()
-            msg.data = get_tool_force()
+            msg.data = get_current_posj()
+            msg.data = [round(num, 2) for num in msg.data]
             self.publisher_.publish(msg)
             self.get_logger().info('Publishing: "%s"' % msg.data)
             self.i += 1
@@ -51,7 +52,7 @@ def main(args=None):
 
     while rclpy.ok():
 
-        temp = ForceStatePublisher()
+        temp = PosjStatePublisher()
 
         rclpy.spin(temp)
 

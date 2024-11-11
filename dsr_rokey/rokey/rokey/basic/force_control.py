@@ -59,7 +59,7 @@ def main(args=None):
 
         movej(JReady, v=30, a=30)
 
-        # movel(pos1_u, v=50, a=30)
+        movel(pos1_u, v=50, a=30)
 
         print('Move complete')
         a = get_current_posx()

@@ -24,7 +24,8 @@ setup(
             "pick_and_place = rokey.basic.pick_and_place:main",
             "sorting = rokey.basic.sorting:main",
             "cup_stack= rokey.basic.stacking:main",
-            "tool_force = rokey.state_publisher.tool_force:main"
+            "tool_force = rokey.state_publisher.tool_force:main",
+            "posj_publisher = rokey.state_publisher.posj_publisher:main"
         ],
     },
 )
