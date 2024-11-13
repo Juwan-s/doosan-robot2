@@ -500,6 +500,8 @@ unsigned int m_port;
 rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_pub_;
 // rclcpp::Publisher<geometry_msgs::msg::WrenchStamped>::SharedPtr tool_force_pub_;
 rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr tool_force_pub_;
+rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr joint_state_pub_;
+
 typedef struct _ROBOT_JOINT_DATA
 {
     double cmd;

@@ -191,7 +191,11 @@ CallbackReturn DRHWInterface::on_init(const hardware_interface::HardwareInfo & i
     m_joint_state_pub_ = m_node_->create_publisher<sensor_msgs::msg::JointState>("joint_states", qos);
     // Tool Force 관련 퍼블리셔
     tool_force_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/tool_force", qos);
-    // tool_force_pub_ = m_node_->create_publisher<geometry_msgs::msg::WrenchStamped>("tool_force", qos);
+    // Joint State 관련 퍼블리셔
+    joint_state_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/joint_state", qos);
+
+
+
     RCLCPP_INFO(rclcpp::get_logger("dsr_hw_interface2"), "Tool force publisher initialized.");
 
 
@@ -644,29 +648,32 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
     g_stDrState.iActualUCN = pData->_tCtrl._tUser._iActualUCN;
     g_stDrState.iParent    = pData->_tCtrl._tUser._iParent;
 
-
-    auto heremsg = std_msgs::msg::Float64MultiArray();
-    heremsg.data.resize(6);
+    // Tool Force Publisher
+    auto tool_force_msg = std_msgs::msg::Float64MultiArray();
+    tool_force_msg.data.resize(6);
 
     for (int i = 0; i < NUM_JOINT; i++){
 
         if(pData){
             g_stDrState.fActualETT[i] = pData->_tCtrl._tUser._fActualETT[i];
-            heremsg.data[i] = pData->_tCtrl._tUser._fActualETT[i];
+            tool_force_msg.data[i] = pData->_tCtrl._tUser._fActualETT[i];
         }    
     }
 
+    tool_force_pub_ -> publish(tool_force_msg);    
 
-    // for(int i = 0; i < 3; i++){
-    //     for(int j = 0; j < 3; j++){
-    //         if(pData){
-    //             g_stDrState.fRotationMatrix[j][i] = pData->_tCtrl._tTask._fRotationMatrix[j][i];    // Rotation Matrix
-    //             heremsg.data[i * 3 + j] = pData->_tCtrl._tTask._fRotationMatrix[j][i]; // 
-                
-    //         }
-    //     }
-    // }
-    tool_force_pub_ -> publish(heremsg);    
+    auto joint_state_msg = std_msgs::msg::Float64MultiArray();
+    joint_state_msg.data.resize(6);
+
+    for (int i = 0; i < NUM_JOINT; i++){
+
+        if(pData){
+            g_stDrState.fCurrentPosj[i] = pData->_tCtrl._tJoint._fActualPos[i];
+            joint_state_msg.data[i] = pData->_tCtrl._tJoint._fActualPos[i];
+        }    
+    }
+
+    joint_state_pub_ -> publish(joint_state_msg);    
 
 
 
