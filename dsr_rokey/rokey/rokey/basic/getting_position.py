@@ -1,14 +1,12 @@
 # pick and place in 1 method. from pos1 to pos2 @20241104
 
 import rclpy
+import DR_init
 
 # for single robot
 ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
-VELOCITY, ACC = 100, 100
-
-
-import DR_init
+VELOCITY, ACC = 60, 60
 
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -16,33 +14,53 @@ DR_init.__dsr__model = ROBOT_MODEL
 
 def main(args=None):
     rclpy.init(args=args)
-    node = rclpy.create_node("move_periodic", namespace=ROBOT_ID)
+    node = rclpy.create_node("dsr_example_demo_py", namespace=ROBOT_ID)
 
     DR_init.__dsr__node = node
 
     try:
         from DSR_ROBOT2 import (
+            get_current_posx,
+            set_velx,
+            set_accx,
             set_tool,
             set_tcp,
             movej,
-            DR_TOOL,
-            amove_periodic,
+            movel,
+            DR_FC_MOD_REL,
+            DR_AXIS_Z,
+            DR_BASE,
         )
+
+        from DR_common2 import posx, posj
 
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
 
+    pos1 = posx([496.06, 93.46, 296.92, 20.75, 179.00, 19.09])
+    pos2 = posx([548.70, -193.46, 96.92, 20.75, 179.00, 19.09])
+    pos3 = posx([596.70, -7.46, 196.92, 20.75, 179.00, 19.09])
+
     JReady = [0, 0, 90, 0, 90, 0]
 
+    set_velx(30, 20)
+    set_accx(60, 40)
+
     while rclpy.ok():
-        set_tool("Tool Weight_RG2")
-        set_tcp("RG2_TCP")
+        set_tool("Tool Weight_2FG")
+        set_tcp("2FG_TCP")
 
-        movej(JReady, vel=VELOCITY, acc=ACC)
-        amove_periodic(amp=[0, 0, 0, 0, 0, 30], period=1.0, atime=0.02, repeat=3, ref=DR_TOOL)
-
-        rclpy.shutdown()
+        # 초기 위치로 이동
+        while True:
+            movej(JReady, vel=VELOCITY, acc=ACC)
+            print("current position1 : ", get_current_posx())
+            movel(pos1, vel=VELOCITY, acc=ACC)
+            print("current position2 : ", get_current_posx())
+            movel(pos2, vel=VELOCITY, acc=ACC)
+            print("current position3 : ", get_current_posx())
+            movel(pos3, vel=VELOCITY, acc=ACC)
+            print("current position4 : ", get_current_posx())
 
 
 if __name__ == "__main__":
