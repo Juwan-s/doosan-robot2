@@ -32,6 +32,7 @@ set(CONTROLLER_INCLUDE_DEPENDS
 )
 
 # find dependencies
+
 find_package(ament_cmake REQUIRED)
 foreach(Dependency IN ITEMS ${HW_IF_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -99,6 +100,7 @@ ament_target_dependencies(
   dsr_hardware2 
   ${HW_IF_INCLUDE_DEPENDS}
   ${CONTROLLER_INCLUDE_DEPENDS}
+  geometry_msgs
 )
 
 

@@ -9,7 +9,12 @@
 #include "dsr_hardware2/dsr_hw_interface2.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
-// #include "dsr_hardware2/dsr_connection_node2.h"
+// 토크 외력 정보를 위한 헤더 파일 include
+
+// #include "geometry_msgs/msg/vector3.hpp"
+
+
+// #include "dsr_hardware2/dsr_connection_node2.h" // 이것의 역할은 모르겠음
 #include <boost/thread/thread.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
@@ -161,6 +166,9 @@ CallbackReturn DRHWInterface::on_init(const hardware_interface::HardwareInfo & i
     std::thread t(threadFunction);
     t.join(); // need to make sure termination of the thread.
 
+
+
+
 //-----------------------------------------------------------------------------------------------------
     
 
@@ -181,6 +189,12 @@ CallbackReturn DRHWInterface::on_init(const hardware_interface::HardwareInfo & i
     m_node_ = rclcpp::Node::make_shared("dsr_hw_interface_update");
     auto qos = rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
     m_joint_state_pub_ = m_node_->create_publisher<sensor_msgs::msg::JointState>("joint_states", qos);
+    // Tool Force 관련 퍼블리셔
+    tool_force_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/tool_force", qos);
+    // tool_force_pub_ = m_node_->create_publisher<geometry_msgs::msg::WrenchStamped>("tool_force", qos);
+    RCLCPP_INFO(rclcpp::get_logger("dsr_hw_interface2"), "Tool force publisher initialized.");
+
+
     //------------------------------------------------------------------------------
     // await for values from ros parameters
     while(m_host == "")
@@ -466,7 +480,7 @@ void DSRInterface::OnMonitoringDataCB(const LPMONITORING_DATA pData)
 {
     // This function is called every 100 msec
     // Only work within 50msec
-    //RCLCPP_INFO(rclcpp::get_logger("dsr_hw_interface2"),"DSRInterface::OnMonitoringDataCB");
+    RCLCPP_INFO(rclcpp::get_logger("dsr_hw_interface2"),"DSRInterface::OnMonitoringDataCB");
 
     g_stDrState.nActualMode  = pData->_tCtrl._tState._iActualMode;                  // position control: 0, torque control: 1 ?????
     g_stDrState.nActualSpace = pData->_tCtrl._tState._iActualSpace;                 // joint space: 0, task space: 1    
@@ -521,6 +535,22 @@ void DSRInterface::OnMonitoringDataCB(const LPMONITORING_DATA pData)
             g_stDrState.bFlangeDigitalOutput[i] = pData->_tMisc._iActualDO[i];      // Digital output data
         }
     }
+
+    // geometry_msgs::msg::WrenchStamped tool_force_msg;
+    // tool_force_msg.header.stamp = m_node_->get_clock()->now();  // 현재 시간 설정
+    // tool_force_msg.header.frame_id = "tool_frame";              // 프레임 ID 설정 (필요에 따라 수정 가능)
+
+    // // fActualETT의 힘과 토크 데이터를 WrenchStamped 메시지에 할당
+    // tool_force_msg.wrench.force.x = g_stDrState.fActualETT[0];
+    // tool_force_msg.wrench.force.y = g_stDrState.fActualETT[1];
+    // tool_force_msg.wrench.force.z = g_stDrState.fActualETT[2];
+    // tool_force_msg.wrench.torque.x = g_stDrState.fActualETT[3];
+    // tool_force_msg.wrench.torque.y = g_stDrState.fActualETT[4];
+    // tool_force_msg.wrench.torque.z = g_stDrState.fActualETT[5];
+
+    // // 퍼블리시 실행
+    // tool_force_pub_->publish(tool_force_msg);
+
 }
 
 // M2.5 or higher    
@@ -613,6 +643,33 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
 
     g_stDrState.iActualUCN = pData->_tCtrl._tUser._iActualUCN;
     g_stDrState.iParent    = pData->_tCtrl._tUser._iParent;
+
+
+    auto heremsg = std_msgs::msg::Float64MultiArray();
+    heremsg.data.resize(6);
+
+    for (int i = 0; i < NUM_JOINT; i++){
+
+        if(pData){
+            g_stDrState.fActualETT[i] = pData->_tCtrl._tUser._fActualETT[i];
+            heremsg.data[i] = pData->_tCtrl._tUser._fActualETT[i];
+        }    
+    }
+
+
+    // for(int i = 0; i < 3; i++){
+    //     for(int j = 0; j < 3; j++){
+    //         if(pData){
+    //             g_stDrState.fRotationMatrix[j][i] = pData->_tCtrl._tTask._fRotationMatrix[j][i];    // Rotation Matrix
+    //             heremsg.data[i * 3 + j] = pData->_tCtrl._tTask._fRotationMatrix[j][i]; // 
+                
+    //         }
+    //     }
+    // }
+    tool_force_pub_ -> publish(heremsg);    
+
+
+
     //-------------------------------------------------------------------------
 }
 

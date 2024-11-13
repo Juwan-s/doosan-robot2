@@ -63,6 +63,8 @@
 #include "std_msgs/msg/float64_multi_array.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
+#include "geometry_msgs/msg/wrench_stamped.hpp"
+// #include "sensor_msgs/msg/imu.hpp"
 
 // msg
 #include "dsr_msgs2/msg/robot_error.hpp"
@@ -496,6 +498,8 @@ unsigned int m_standby;
 bool m_command;
 unsigned int m_port;
 rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr m_joint_state_pub_;
+// rclcpp::Publisher<geometry_msgs::msg::WrenchStamped>::SharedPtr tool_force_pub_;
+rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr tool_force_pub_;
 typedef struct _ROBOT_JOINT_DATA
 {
     double cmd;
@@ -531,6 +535,8 @@ namespace dsr_hardware2{
         ~DRHWInterface();
 
     protected:
+        // 
+        
         /// The size of this vector is (standard_interfaces_.size() x nr_joints)
         std::vector<double> joint_position_command_;
         std::vector<double> joint_velocities_command_;
