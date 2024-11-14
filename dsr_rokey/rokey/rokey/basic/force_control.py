@@ -51,16 +51,17 @@ def main(args=None):
         set_tcp("2FG_TCP")
 
         # 초기 위치로 이동
-        movej(JReady, vel=VELOCITY, acc=ACC)
+        while 1:
+            movej(JReady, vel=VELOCITY, acc=ACC)
 
-        movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
-        task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
-        set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
+            movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
+            task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
+            set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
 
-        while not check_force_condition(DR_AXIS_Z, max=5):
-            pass
+            while not check_force_condition(DR_AXIS_Z, max=5):
+                pass
 
-        release_compliance_ctrl()
+            release_compliance_ctrl()
 
         rclpy.shutdown()
 

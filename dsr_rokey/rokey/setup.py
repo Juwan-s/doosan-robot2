@@ -21,11 +21,9 @@ setup(
     entry_points={
         'console_scripts': [
             "force_control = rokey.basic.force_control:main",
+            "move_periodic = rokey.basic.move_periodic:main",
+            "getting_position = rokey.basic.getting_position:main",
             "pick_and_place = rokey.basic.pick_and_place:main",
-            "sorting = rokey.basic.sorting:main",
-            "cup_stack= rokey.basic.stacking:main",
-            "tool_force = rokey.state_publisher.tool_force:main",
-            "posj_publisher = rokey.state_publisher.posj_publisher:main"
         ],
     },
 )
