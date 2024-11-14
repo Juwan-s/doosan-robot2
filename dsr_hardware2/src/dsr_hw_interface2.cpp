@@ -193,6 +193,8 @@ CallbackReturn DRHWInterface::on_init(const hardware_interface::HardwareInfo & i
     tool_force_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/tool_force", qos);
     // Joint State 관련 퍼블리셔
     joint_state_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/joint_state", qos);
+    // Current PosX 관련 퍼블리셔
+    current_posx_pub_ = m_node_->create_publisher<std_msgs::msg::Float64MultiArray>("msg/current_posx", qos);
 
 
 
@@ -659,6 +661,7 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
 
     // Joint State Publisher
     auto joint_state_msg = std_msgs::msg::Float64MultiArray();
+
     joint_state_msg.data.resize(6);
 
     for (int i = 0; i < NUM_JOINT; i++){
@@ -670,6 +673,25 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
     }
 
     joint_state_pub_ -> publish(joint_state_msg);    
+
+
+    // Current
+
+    auto current_posx_msg = std_msgs::msg::Float64MultiArray();
+    
+    current_posx_msg.data.resize(6);
+
+    for (int i = 0; i < NUM_JOINT; i++){
+
+        if(pData){
+            g_stDrState.fTargetPosx[i]  = pData->_tCtrl._tTask._fTargetPos[i];
+            current_posx_msg.data[i] = pData->_tCtrl._tTask._fTargetPos[i];
+        }    
+    }
+
+    current_posx_pub_ -> publish(current_posx_msg);    
+    
+
 
 
 
