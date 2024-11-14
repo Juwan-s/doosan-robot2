@@ -540,21 +540,6 @@ void DSRInterface::OnMonitoringDataCB(const LPMONITORING_DATA pData)
         }
     }
 
-    // geometry_msgs::msg::WrenchStamped tool_force_msg;
-    // tool_force_msg.header.stamp = m_node_->get_clock()->now();  // 현재 시간 설정
-    // tool_force_msg.header.frame_id = "tool_frame";              // 프레임 ID 설정 (필요에 따라 수정 가능)
-
-    // // fActualETT의 힘과 토크 데이터를 WrenchStamped 메시지에 할당
-    // tool_force_msg.wrench.force.x = g_stDrState.fActualETT[0];
-    // tool_force_msg.wrench.force.y = g_stDrState.fActualETT[1];
-    // tool_force_msg.wrench.force.z = g_stDrState.fActualETT[2];
-    // tool_force_msg.wrench.torque.x = g_stDrState.fActualETT[3];
-    // tool_force_msg.wrench.torque.y = g_stDrState.fActualETT[4];
-    // tool_force_msg.wrench.torque.z = g_stDrState.fActualETT[5];
-
-    // // 퍼블리시 실행
-    // tool_force_pub_->publish(tool_force_msg);
-
 }
 
 // M2.5 or higher    
@@ -648,6 +633,16 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
     g_stDrState.iActualUCN = pData->_tCtrl._tUser._iActualUCN;
     g_stDrState.iParent    = pData->_tCtrl._tUser._iParent;
 
+    // 
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@  User Defined Robot State info Pulisher  @@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
     // Tool Force Publisher
     auto tool_force_msg = std_msgs::msg::Float64MultiArray();
     tool_force_msg.data.resize(6);
@@ -662,6 +657,7 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
 
     tool_force_pub_ -> publish(tool_force_msg);    
 
+    // Joint State Publisher
     auto joint_state_msg = std_msgs::msg::Float64MultiArray();
     joint_state_msg.data.resize(6);
 
@@ -677,7 +673,7 @@ void DSRInterface::OnMonitoringDataExCB(const LPMONITORING_DATA_EX pData)
 
 
 
-    //-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 }
 
 void DSRInterface::OnMonitoringModbusCB (const LPMONITORING_MODBUS pModbus)
