@@ -22,27 +22,27 @@ def main(args=None):
 
     try:
         from DSR_ROBOT2 import (
+            amove_periodic,
             set_tool,
             set_tcp,
             movej,
             DR_TOOL,
-            amove_periodic,
         )
 
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
 
+    set_tool("Tool Weight_RG2")
+    set_tcp("RG2_TCP")
     JReady = [0, 0, 90, 0, 90, 0]
 
-    while rclpy.ok():
-        set_tool("Tool Weight_RG2")
-        set_tcp("RG2_TCP")
+    if rclpy.ok():
 
         movej(JReady, vel=VELOCITY, acc=ACC)
         amove_periodic(amp=[0, 0, 0, 0, 0, 30], period=1.0, atime=0.02, repeat=3, ref=DR_TOOL)
 
-        rclpy.shutdown()
+    rclpy.shutdown()
 
 
 if __name__ == "__main__":

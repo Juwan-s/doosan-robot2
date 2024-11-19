@@ -22,8 +22,8 @@ setup(
             "force_control = rokey.basic.force_control:main",
             "move_periodic = rokey.basic.move_periodic:main",
             "getting_position = rokey.basic.getting_position:main",
-            "pick_and_place = rokey.basic.pick_and_place:main",
             "simple_move=rokey.basic.move:main",
+            "grip=rokey.basic.grip:main",
         ],
     },
 )

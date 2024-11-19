@@ -21,8 +21,6 @@ def main(args=None):
     try:
         from DSR_ROBOT2 import (
             get_current_posx,
-            set_velx,
-            set_accx,
             set_tool,
             set_tcp,
             movej,
@@ -38,29 +36,28 @@ def main(args=None):
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
 
+    JReady = posj([0, 0, 90, 0, 90, 0])
     pos1 = posx([496.06, 93.46, 296.92, 20.75, 179.00, 19.09])
     pos2 = posx([548.70, -193.46, 96.92, 20.75, 179.00, 19.09])
     pos3 = posx([596.70, -7.46, 196.92, 20.75, 179.00, 19.09])
 
-    JReady = [0, 0, 90, 0, 90, 0]
+    set_tool("Tool Weight_2FG")
+    set_tcp("2FG_TCP")
 
-    set_velx(30, 20)
-    set_accx(60, 40)
+    if rclpy.ok():
 
-    while rclpy.ok():
-        set_tool("Tool Weight_2FG")
-        set_tcp("2FG_TCP")
+        movej(JReady, vel=VELOCITY, acc=ACC)
+        print("current position1 : ", get_current_posx())
+        movel(pos1, vel=VELOCITY, acc=ACC)
+        print("current position2 : ", get_current_posx())
+        movel(pos2, vel=VELOCITY, acc=ACC)
+        print("current position3 : ", get_current_posx())
+        movel(pos3, vel=VELOCITY, acc=ACC)
+        print("current position4 : ", get_current_posx())
+        movej(JReady, vel=VELOCITY, acc=ACC)
+        print("current position1 : ", get_current_posx())
 
-        # 초기 위치로 이동
-        while True:
-            movej(JReady, vel=VELOCITY, acc=ACC)
-            print("current position1 : ", get_current_posx())
-            movel(pos1, vel=VELOCITY, acc=ACC)
-            print("current position2 : ", get_current_posx())
-            movel(pos2, vel=VELOCITY, acc=ACC)
-            print("current position3 : ", get_current_posx())
-            movel(pos3, vel=VELOCITY, acc=ACC)
-            print("current position4 : ", get_current_posx())
+    rclpy.shutdown()
 
 
 if __name__ == "__main__":

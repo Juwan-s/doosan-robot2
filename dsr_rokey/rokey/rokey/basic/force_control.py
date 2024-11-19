@@ -45,25 +45,21 @@ def main(args=None):
 
     # 초기 위치
     JReady = [0, 0, 90, 0, 90, 0]
+    set_tool("Tool Weight_2FG")
+    set_tcp("2FG_TCP")
 
     while rclpy.ok():
-        set_tool("Tool Weight_2FG")
-        set_tcp("2FG_TCP")
-
         # 초기 위치로 이동
-        while 1:
-            movej(JReady, vel=VELOCITY, acc=ACC)
+        movej(JReady, vel=VELOCITY, acc=ACC)
+        movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
+        task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
+        set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
+        while not check_force_condition(DR_AXIS_Z, max=5):
+            pass
 
-            movel(pos, vel=VELOCITY, acc=ACC, ref=DR_BASE)
-            task_compliance_ctrl(stx=[500, 500, 500, 100, 100, 100])
-            set_desired_force(fd=[0, 0, -10, 0, 0, 0], dir=[0, 0, 1, 0, 0, 0], mod=DR_FC_MOD_REL)
+        release_compliance_ctrl()
 
-            while not check_force_condition(DR_AXIS_Z, max=5):
-                pass
-
-            release_compliance_ctrl()
-
-        rclpy.shutdown()
+    rclpy.shutdown()
 
 
 if __name__ == "__main__":
