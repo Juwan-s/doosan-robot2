@@ -37,21 +37,20 @@ def main(args=None):
     pos2 = posx([548.70, -193.46, 96.92, 20.75, 179.00, 19.09])
     pos3 = posx([596.70, -7.46, 196.92, 20.75, 179.00, 19.09])
 
+    set_tool("Tool Weight_2FG")
+    set_tcp("2FG_TCP")
+
     while rclpy.ok():
-        set_tool("Tool Weight_2FG")
-        set_tcp("2FG_TCP")
 
-        # 초기 위치로 이동
-        while True:
-            print("movej")
-            movej(JReady, vel=VELOCITY, acc=ACC)
-            print("movel")
-            movel(pos1, vel=VELOCITY, acc=ACC)
-            print("movel")
-            movel(pos2, vel=VELOCITY, acc=ACC)
-            print("movel")
-            movel(pos3, vel=VELOCITY, acc=ACC)
+        print("movej")
+        movej(JReady, vel=VELOCITY, acc=ACC)
+        print("movel")
+        movel(pos1, vel=VELOCITY, acc=ACC)
+        print("movel")
+        movel(pos2, vel=VELOCITY, acc=ACC)
+        print("movel")
+        movel(pos3, vel=VELOCITY, acc=ACC)
 
-
+    rclpy.shutdown()
 if __name__ == "__main__":
     main()
