@@ -89,9 +89,9 @@ def main(args=None):
                 entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
                 data_entries.append(entry)
             else:
-                entry = tk.Scale(root, from_=10, to=60, orient=tk.HORIZONTAL)
+                entry = tk.Scale(root, from_=10, to=60, orient=tk.HORIZONTAL, length=200)
                 entry.set(default_value)
-                entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
+                entry.grid(row=i + 1, column=col + 1, padx=10, pady=5, columnspan=3)
                 data_entries.append(entry)
 
         return data_entries
