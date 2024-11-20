@@ -82,10 +82,18 @@ def main(args=None):
         for i, (label_text, default_value) in enumerate(zip(labels, default_values)):
             label = tk.Label(root, text=label_text)
             label.grid(row=i + 1, column=col, padx=10, pady=5)
-            entry = tk.Entry(root, width=10)
-            entry.insert(0, str(round(default_value, 3)))
-            entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
-            data_entries.append(entry)
+
+            if i <= 5:
+                entry = tk.Entry(root, width=10)
+                entry.insert(0, str(round(default_value, 3)))
+                entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
+                data_entries.append(entry)
+            else:
+                entry = tk.Scale(root, from_=10, to=60, orient=tk.HORIZONTAL)
+                entry.set(default_value)
+                entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
+                data_entries.append(entry)
+
         return data_entries
 
     def create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value):
