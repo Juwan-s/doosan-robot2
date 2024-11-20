@@ -40,35 +40,6 @@ def main(args=None):
         print(f"Error importing DSR_ROBOT2: {e}")
         return
 
-    # Joint and Linear Movement Functions
-    def move_by_joint(entries_x, entries_j):
-        inputs = [float(entry.get()) for entry in entries_j]
-        pos = inputs[:-2]
-        is_success = movej(pos, vel=inputs[-2], acc=inputs[-1])
-        mwait()
-        update_entries(get_current_posx()[0], entries_x)
-        print("current posx : ", get_current_posx())
-        print("current posj : ", get_current_posj())
-        print("is_success:", is_success)
-
-    def move_by_line(entries_x, entries_j):
-        inputs = [float(entry.get()) for entry in entries_x]
-        pos = inputs[:-2]
-        is_success = movel(pos, vel=inputs[-2], acc=inputs[-1], ref=DR_BASE)
-        mwait()
-        update_entries(get_current_posj(), entries_j)
-
-        print("current posx : ", get_current_posx())
-        print("current posj : ", get_current_posj())
-        print("is_success:", is_success)
-
-    # Utility to update entry fields
-    def update_entries(values, entries):
-        for i, val in enumerate(values):
-            if val:
-                entries[i].delete(0, tk.END)
-                entries[i].insert(0, str(round(val, 3)))
-
     def create_label_entry(root, text, row, col):
         label = tk.Label(root, text=text)
         label.grid(row=row + 1, column=col - 1, padx=10, pady=5)
@@ -103,22 +74,6 @@ def main(args=None):
             tk.Button(root, text="+", command=lambda i=i: increment_linear(axes_data, joint_data, i, float(increment_x_value.get()))).grid(row=i + 1, column=7, padx=2, pady=5)
             tk.Button(root, text="-", command=lambda i=i: increment_linear(axes_data, joint_data, i, -float(increment_x_value.get()))).grid(row=i + 1, column=8, padx=2, pady=5)
 
-    def copy_to_clipboard(root, entries):
-        root.clipboard_clear()
-
-        clipboard_text = "[" + ", ".join([entry.get() for entry in entries]) + "]"
-        root.clipboard_append(clipboard_text)
-        root.update()
-
-    def z_axis_alignment(data, axes_data, joint_data):
-        vect = [0, 0, -1]
-        parallel_axis(vect, DR_AXIS_Z, DR_BASE)
-        mwait()
-        print("move to z-axis alignment")
-        update_entries(get_current_posj(), joint_data)
-        update_entries(get_current_posx()[0], axes_data)
-        # move_by_line(axes_data, joint_data)
-
     def create_control_buttons(root, joint_data, axes_data):
         tk.Button(root, text="movej", command=lambda: move_by_joint(axes_data, joint_data)).grid(row=9, column=1, columnspan=1, pady=10)
         tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, joint_data)).grid(row=9, column=2, columnspan=1, pady=10)
@@ -131,9 +86,54 @@ def main(args=None):
         tk.Button(root, text="grip", command=lambda: grip()).grid(row=0, column=0, columnspan=4, pady=10)
         tk.Button(root, text="release", command=lambda: release()).grid(row=0, column=4, columnspan=4, pady=10)
 
-        tk.Button(root, text="z-axis alignment", command=lambda: z_axis_alignment([None, None, None, None, 180, None], axes_data, joint_data)).grid(row=11, column=2, columnspan=4, pady=10)
+        tk.Button(root, text="z-axis alignment", command=lambda: z_axis_alignment(axes_data, joint_data)).grid(row=11, column=2, columnspan=4, pady=10)
 
-        # update_entriesget_current_posj(), entries_j
+    # Joint and Linear Movement Functions
+    def move_by_joint(entries_x, entries_j):
+        inputs = [float(entry.get()) for entry in entries_j]
+        pos = inputs[:-2]
+        is_success = movej(pos, vel=inputs[-2], acc=inputs[-1])
+        mwait()
+        update_entries(get_current_posx()[0], entries_x)
+        update_entries(get_current_posj(), entries_j)
+
+        print("current posx : ", get_current_posx())
+        print("current posj : ", get_current_posj())
+        print("is_success:", is_success)
+
+    def move_by_line(entries_x, entries_j):
+        inputs = [float(entry.get()) for entry in entries_x]
+        pos = inputs[:-2]
+        is_success = movel(pos, vel=inputs[-2], acc=inputs[-1], ref=DR_BASE)
+        mwait()
+        update_entries(get_current_posj(), entries_j)
+        update_entries(get_current_posx()[0], entries_x)
+
+        print("current posx : ", get_current_posx())
+        print("current posj : ", get_current_posj())
+        print("is_success:", is_success)
+
+    # Utility to update entry fields
+    def update_entries(values, entries):
+        for i, val in enumerate(values):
+            if val:
+                entries[i].delete(0, tk.END)
+                entries[i].insert(0, str(round(val, 3)))
+
+    def copy_to_clipboard(root, entries):
+        root.clipboard_clear()
+        clipboard_text = "[" + ", ".join([entry.get() for entry in entries]) + "]"
+        root.clipboard_append(clipboard_text)
+        root.update()
+
+    def z_axis_alignment(axes_data, joint_data):
+        vect = [0, 0, -1]
+        parallel_axis(vect, DR_AXIS_Z, DR_BASE)
+        mwait()
+        print("move to z-axis alignment")
+        update_entries(get_current_posj(), joint_data)
+        update_entries(get_current_posx()[0], axes_data)
+        # move_by_line(axes_data, joint_data)
 
     # Increment functions for joint and linear positions
     def increment_joint(entries_x, entries_j, idx, increment):
@@ -171,23 +171,22 @@ def main(args=None):
     root = tk.Tk()
     root.title("Pos 설정")
 
-    # Increment Input Fields
-    increment_j_value = create_label_entry(root, "Joint Increment", 9, 1)
-    increment_x_value = create_label_entry(root, "Linear Increment", 9, 6)
-
-    # Joint and Axis Position Data
+    # Joint and Axis Position Data(row: 1~8, Joint and Axis Entries)
     print("create_position_entries")
     joint_data, axes_data = create_position_entries(
         root, labels=["J1", "J2", "J3", "J4", "J5", "J6", "Speed", "Acc"], default_values=get_current_posj() + [VELOCITY, ACC], col=0
     ), create_position_entries(root, labels=["X", "Y", "Z", "Rx", "Ry", "Rz", "Speed", "Acc"], default_values=get_current_posx()[0] + [VELOCITY, ACC], col=5)
 
-    # Increment Buttons
-    print("increment buttons")
-    create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value)
-
-    # Control Buttons
+    # Control Buttons(row: [0, 9, 11], grip, release, movej, movel, copy, z-axis alignment)
     print("control buttons")
     create_control_buttons(root, joint_data, axes_data)
+
+    # Increment Input Fields(row: 9, Increment Entry)
+    increment_j_value = create_label_entry(root, "Joint Increment", 9, 1)
+    increment_x_value = create_label_entry(root, "Linear Increment", 9, 6)
+    # Increment Buttons(row: 1~7, +- buttons)
+    print("increment buttons")
+    create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value)
 
     # Run UI
     root.mainloop()
