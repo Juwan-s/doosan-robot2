@@ -69,10 +69,18 @@ def main(args=None):
 
     def create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value):
         for i in range(6):
-            tk.Button(root, text="+", command=lambda i=i: increment_joint(axes_data, joint_data, i, float(increment_j_value.get()))).grid(row=i + 1, column=2, padx=2, pady=5)
-            tk.Button(root, text="-", command=lambda i=i: increment_joint(axes_data, joint_data, i, -float(increment_j_value.get()))).grid(row=i + 1, column=3, padx=2, pady=5)
-            tk.Button(root, text="+", command=lambda i=i: increment_linear(axes_data, joint_data, i, float(increment_x_value.get()))).grid(row=i + 1, column=7, padx=2, pady=5)
-            tk.Button(root, text="-", command=lambda i=i: increment_linear(axes_data, joint_data, i, -float(increment_x_value.get()))).grid(row=i + 1, column=8, padx=2, pady=5)
+            tk.Button(root, text="+", command=lambda i=i: increment_joint(axes_data, joint_data, i, float(increment_j_value.get()))).grid(
+                row=i + 1, column=2, padx=2, pady=5
+            )
+            tk.Button(root, text="-", command=lambda i=i: increment_joint(axes_data, joint_data, i, -float(increment_j_value.get()))).grid(
+                row=i + 1, column=3, padx=2, pady=5
+            )
+            tk.Button(root, text="+", command=lambda i=i: increment_linear(axes_data, joint_data, i, float(increment_x_value.get()))).grid(
+                row=i + 1, column=7, padx=2, pady=5
+            )
+            tk.Button(root, text="-", command=lambda i=i: increment_linear(axes_data, joint_data, i, -float(increment_x_value.get()))).grid(
+                row=i + 1, column=8, padx=2, pady=5
+            )
 
     def create_control_buttons(root, joint_data, axes_data):
         tk.Button(root, text="movej", command=lambda: move_by_joint(axes_data, joint_data)).grid(row=9, column=1, columnspan=1, pady=10)
@@ -122,8 +130,9 @@ def main(args=None):
 
     def copy_to_clipboard(root, entries):
         root.clipboard_clear()
-        clipboard_text = "[" + ", ".join([entry.get() for entry in entries]) + "]"
+        clipboard_text = "[" + ", ".join([str(entry.get()) for entry in entries]) + "]"
         root.clipboard_append(clipboard_text)
+        print(f"copy to clipboard: {clipboard_text}")
         root.update()
 
     def z_axis_alignment(axes_data, joint_data):
