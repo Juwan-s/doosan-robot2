@@ -1,15 +1,15 @@
-# 
+#
 #  dsr_bringup2
 #  Author: Minsoo Song (minsoo.song@doosan.com)
-#  
+#
 #  Copyright (c) 2024 Doosan Robotics
 #  Use of this source code is governed by the BSD, see LICENSE
-# 
+#
 
 import os
 
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler,DeclareLaunchArgument
+from launch.actions import RegisterEventHandler, DeclareLaunchArgument
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution, LaunchConfiguration
 
@@ -22,25 +22,27 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import OpaqueFunction
 from moveit_configs_utils import MoveItConfigsBuilder
 
+
 def print_launch_configuration_value(context, *args, **kwargs):
     # LaunchConfiguration 값을 평가합니다.
-    gz_value = LaunchConfiguration('gz').perform(context)
+    gz_value = LaunchConfiguration("gz").perform(context)
     # 평가된 값을 콘솔에 출력합니다.
-    print(f'LaunchConfiguration gz: {gz_value}')
+    print(f"LaunchConfiguration gz: {gz_value}")
     return gz_value
 
+
 def generate_launch_description():
-    ARGUMENTS =[ 
-        DeclareLaunchArgument('name',  default_value = '',     description = 'NAME_SPACE'     ),
-        DeclareLaunchArgument('host',  default_value = '192.168.137.100', description = 'ROBOT_IP'       ),
-        DeclareLaunchArgument('port',  default_value = '12345',     description = 'ROBOT_PORT'     ),
-        DeclareLaunchArgument('mode',  default_value = 'real',   description = 'OPERATION MODE' ),
-        DeclareLaunchArgument('model', default_value = 'm1013',     description = 'ROBOT_MODEL'    ),
-        DeclareLaunchArgument('color', default_value = 'white',     description = 'ROBOT_COLOR'    ),
-        DeclareLaunchArgument('gz',    default_value = 'false',     description = 'USE GAZEBO SIM'    ),
+    ARGUMENTS = [
+        DeclareLaunchArgument("name", default_value="", description="NAME_SPACE"),
+        DeclareLaunchArgument("host", default_value="192.168.137.100", description="ROBOT_IP"),
+        DeclareLaunchArgument("port", default_value="12345", description="ROBOT_PORT"),
+        DeclareLaunchArgument("mode", default_value="real", description="OPERATION MODE"),
+        DeclareLaunchArgument("model", default_value="m1013", description="ROBOT_MODEL"),
+        DeclareLaunchArgument("color", default_value="white", description="ROBOT_COLOR"),
+        DeclareLaunchArgument("gz", default_value="false", description="USE GAZEBO SIM"),
     ]
-    xacro_path = os.path.join( get_package_share_directory('dsr_description2'), 'xacro')
-    
+    xacro_path = os.path.join(get_package_share_directory("dsr_description2"), "xacro")
+
     # Get URDF via xacro
     robot_description_content = Command(
         [
@@ -50,7 +52,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("dsr_description2"),
                     "xacro",
-                    LaunchConfiguration('model'),
+                    LaunchConfiguration("model"),
                 ]
             ),
             ".urdf.xacro",
@@ -66,25 +68,23 @@ def generate_launch_description():
             "dsr_controller2.yaml",
         ]
     )
-    rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("dsr_description2"), "rviz", "default.rviz"]
-    )
-    
+    rviz_config_file = PathJoinSubstitution([FindPackageShare("dsr_description2"), "rviz", "default.rviz"])
+
     connection_node = Node(
         package="dsr_bringup2",
         executable="connection",
         parameters=[
-            {"name":    LaunchConfiguration('name')  }, 
-            {"rate":    100         },
-            {"standby": 5000        },
-            {"command": True        },
-            {"host":    LaunchConfiguration('host')  },
-            {"port":    LaunchConfiguration('port')  },
-            {"mode":    LaunchConfiguration('mode')  },
-            {"model":   LaunchConfiguration('model') },
-            {"gripper": "none"      },
-            {"mobile":  "none"      },
-            #parameters_file_path       # 파라미터 설정을 동일이름으로 launch 파일과 yaml 파일에서 할 경우 yaml 파일로 셋팅된다.    
+            {"name": LaunchConfiguration("name")},
+            {"rate": 100},
+            {"standby": 5000},
+            {"command": True},
+            {"host": LaunchConfiguration("host")},
+            {"port": LaunchConfiguration("port")},
+            {"mode": LaunchConfiguration("mode")},
+            {"model": LaunchConfiguration("model")},
+            {"gripper": "none"},
+            {"mobile": "none"},
+            # parameters_file_path       # 파라미터 설정을 동일이름으로 launch 파일과 yaml 파일에서 할 경우 yaml 파일로 셋팅된다.
         ],
         output="screen",
     )
@@ -97,15 +97,15 @@ def generate_launch_description():
         output="both",
     )
     robot_state_pub_node = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        namespace=LaunchConfiguration('name'),
-        output='both',
-        parameters=[{
-        'robot_description': Command(['xacro', ' ', xacro_path, '/', LaunchConfiguration('model'), '.urdf.xacro color:=', LaunchConfiguration('color')])           
-    }])
-    
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
+        namespace=LaunchConfiguration("name"),
+        output="both",
+        parameters=[
+            {"robot_description": Command(["xacro", " ", xacro_path, "/", LaunchConfiguration("model"), ".urdf.xacro color:=", LaunchConfiguration("color")])}
+        ],
+    )
 
     moveit_config = (
         MoveItConfigsBuilder("m1013")
@@ -122,11 +122,9 @@ def generate_launch_description():
         output="screen",
         parameters=[moveit_config.to_dict()],
     )
-    
+
     # RViz
-    rviz_base = os.path.join(
-        get_package_share_directory("m1013_moveit_config"), "launch"
-    )
+    rviz_base = os.path.join(get_package_share_directory("m1013_moveit_config"), "launch")
     rviz_full_config = os.path.join(rviz_base, "moveit.rviz")
 
     rviz_node = Node(
@@ -152,11 +150,11 @@ def generate_launch_description():
 
     robot_controller_spawner = Node(
         package="controller_manager",
-        namespace=LaunchConfiguration('name'),
+        namespace=LaunchConfiguration("name"),
         executable="spawner",
         arguments=["dsr_controller2", "-c", "/controller_manager"],
     )
-    
+
     joint_trajectory_controller_spawner = Node(
         package="controller_manager",
         # namespace=LaunchConfiguration('name'),
@@ -173,7 +171,6 @@ def generate_launch_description():
             "/controller_manager",
         ],
     )
-
 
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(

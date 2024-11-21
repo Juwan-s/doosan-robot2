@@ -6,6 +6,8 @@ import tkinter as tk
 from tkinter import StringVar
 import threading
 
+from dsr_msgs2.srv import SetRobotMode
+
 
 def copy_to_clipboard(root, text_box):
     text = text_box.get().strip()
@@ -20,6 +22,23 @@ def create_entries(root, default_value, row, col):
     entry = tk.Entry(root, textvariable=entry_var, width=40)
     entry.grid(row=row, column=col, padx=10, pady=5)
     return entry_var
+
+
+class ServiceClinetNode(Node):
+    def __init__(self):
+        super().__init__("service_client_node")
+
+        self.cli = self.create_client(SetRobotMode, "/dsr01/system/set_robot_mode")
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            print("Waiting for service...")
+            pass
+
+    def send_request(self, mode=0):
+        request = SetRobotMode.Request()
+        request.robot_mode = mode
+        future = self.cli.call_async(request)
+        rclpy.spin_until_future_complete(self, future)
+        return future.result()
 
 
 class PosTopicSubscriber(Node):
@@ -52,7 +71,6 @@ class PosTopicSubscriber(Node):
 
 
 def ros_thread(text_var1, text_var2):
-    rclpy.init()
     node = PosTopicSubscriber(text_var1, text_var2)
     try:
         rclpy.spin(node)
@@ -73,6 +91,13 @@ def main():
     tk.Label(root, text="joint_state:").grid(row=1, column=0)
     text_var2 = create_entries(root, 0.0, 1, 1)
     tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, text_var2)).grid(row=1, column=3, padx=2, pady=5)
+
+    # 서비스 실행
+    print("Service Start")
+    rclpy.init()
+    client_node = ServiceClinetNode()
+    response = client_node.send_request(0)
+    client_node.get_logger().info(f"results: {response}")
 
     # ROS2 스레드 실행
     ros = threading.Thread(target=ros_thread, args=(text_var1, text_var2))
