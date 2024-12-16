@@ -20,7 +20,6 @@ setup(
     entry_points={
         "console_scripts": [
             "force_control = rokey.basic.force_control:main",
-            "jog_example = rokey.basic.jog_example:main",
             "jog = rokey.basic.jog_complete:main",
             "move_periodic = rokey.basic.move_periodic:main",
             "getting_position = rokey.basic.getting_position:main",
