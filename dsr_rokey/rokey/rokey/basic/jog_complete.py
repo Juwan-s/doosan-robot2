@@ -67,34 +67,68 @@ def main(args=None):
 
         return data_entries
 
-    def create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value):
+    def create_increment_buttons(
+        root, joint_data, axes_data, increment_j_value, increment_x_value
+    ):
         for i in range(6):
-            tk.Button(root, text="+", command=lambda i=i: increment_joint(axes_data, joint_data, i, float(increment_j_value.get()))).grid(
-                row=i + 1, column=2, padx=2, pady=5
-            )
-            tk.Button(root, text="-", command=lambda i=i: increment_joint(axes_data, joint_data, i, -float(increment_j_value.get()))).grid(
-                row=i + 1, column=3, padx=2, pady=5
-            )
-            tk.Button(root, text="+", command=lambda i=i: increment_linear(axes_data, joint_data, i, float(increment_x_value.get()))).grid(
-                row=i + 1, column=7, padx=2, pady=5
-            )
-            tk.Button(root, text="-", command=lambda i=i: increment_linear(axes_data, joint_data, i, -float(increment_x_value.get()))).grid(
-                row=i + 1, column=8, padx=2, pady=5
-            )
+            tk.Button(
+                root,
+                text="+",
+                command=lambda i=i: increment_joint(
+                    axes_data, joint_data, i, float(increment_j_value.get())
+                ),
+            ).grid(row=i + 1, column=2, padx=2, pady=5)
+            tk.Button(
+                root,
+                text="-",
+                command=lambda i=i: increment_joint(
+                    axes_data, joint_data, i, -float(increment_j_value.get())
+                ),
+            ).grid(row=i + 1, column=3, padx=2, pady=5)
+            tk.Button(
+                root,
+                text="+",
+                command=lambda i=i: increment_linear(
+                    axes_data, joint_data, i, float(increment_x_value.get())
+                ),
+            ).grid(row=i + 1, column=7, padx=2, pady=5)
+            tk.Button(
+                root,
+                text="-",
+                command=lambda i=i: increment_linear(
+                    axes_data, joint_data, i, -float(increment_x_value.get())
+                ),
+            ).grid(row=i + 1, column=8, padx=2, pady=5)
 
     def create_control_buttons(root, joint_data, axes_data):
-        tk.Button(root, text="movej", command=lambda: move_by_joint(axes_data, joint_data)).grid(row=9, column=1, columnspan=1, pady=10)
-        tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, joint_data)).grid(row=9, column=2, columnspan=1, pady=10)
+        tk.Button(
+            root, text="movej", command=lambda: move_by_joint(axes_data, joint_data)
+        ).grid(row=9, column=1, columnspan=1, pady=10)
+        tk.Button(
+            root, text="copy", command=lambda: copy_to_clipboard(root, joint_data)
+        ).grid(row=9, column=2, columnspan=1, pady=10)
 
         print("make movel button")
-        tk.Button(root, text="movel", command=lambda: move_by_line(axes_data, joint_data)).grid(row=9, column=6, columnspan=1, pady=10)
-        tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, axes_data)).grid(row=9, column=7, columnspan=1, pady=10)
+        tk.Button(
+            root, text="movel", command=lambda: move_by_line(axes_data, joint_data)
+        ).grid(row=9, column=6, columnspan=1, pady=10)
+        tk.Button(
+            root, text="copy", command=lambda: copy_to_clipboard(root, axes_data)
+        ).grid(row=9, column=7, columnspan=1, pady=10)
 
         print("make grip button")
-        tk.Button(root, text="grip", command=lambda: grip()).grid(row=0, column=0, columnspan=4, pady=10)
-        tk.Button(root, text="release", command=lambda: release()).grid(row=0, column=4, columnspan=4, pady=10)
+        tk.Button(root, text="grip", command=lambda: grip()).grid(
+            row=0, column=0, columnspan=4, pady=10
+        )
+        tk.Button(root, text="release", command=lambda: release()).grid(
+            row=0, column=4, columnspan=4, pady=10
+        )
 
-        tk.Button(root, text="z-axis alignment", command=lambda: z_axis_alignment(axes_data, joint_data)).grid(row=11, column=2, columnspan=4, pady=10)
+        tk.Button(
+            root,
+            text="z-axis alignment",
+            command=lambda: z_axis_alignment(axes_data, joint_data),
+        ).grid(row=11, column=2, columnspan=4, pady=10)
 
     # Joint and Linear Movement Functions
     def move_by_joint(entries_x, entries_j):
@@ -130,7 +164,9 @@ def main(args=None):
 
     def copy_to_clipboard(root, entries):
         root.clipboard_clear()
-        clipboard_text = "[" + ", ".join([str(entry.get()) for entry in entries]) + "]"
+        clipboard_text = (
+            "[" + ", ".join([str(entry.get()) for entry in entries[:6]]) + "]"
+        )
         root.clipboard_append(clipboard_text)
         print(f"copy to clipboard: {clipboard_text}")
         root.update()
@@ -183,8 +219,16 @@ def main(args=None):
     # Joint and Axis Position Data(row: 1~8, Joint and Axis Entries)
     print("create_position_entries")
     joint_data, axes_data = create_position_entries(
-        root, labels=["J1", "J2", "J3", "J4", "J5", "J6", "Speed", "Acc"], default_values=get_current_posj() + [VELOCITY, ACC], col=0
-    ), create_position_entries(root, labels=["X", "Y", "Z", "Rx", "Ry", "Rz", "Speed", "Acc"], default_values=get_current_posx()[0] + [VELOCITY, ACC], col=5)
+        root,
+        labels=["J1", "J2", "J3", "J4", "J5", "J6", "Speed", "Acc"],
+        default_values=get_current_posj() + [VELOCITY, ACC],
+        col=0,
+    ), create_position_entries(
+        root,
+        labels=["X", "Y", "Z", "Rx", "Ry", "Rz", "Speed", "Acc"],
+        default_values=get_current_posx()[0] + [VELOCITY, ACC],
+        col=5,
+    )
 
     # Control Buttons(row: [0, 9, 11], grip, release, movej, movel, copy, z-axis alignment)
     print("control buttons")
@@ -195,7 +239,9 @@ def main(args=None):
     increment_x_value = create_label_entry(root, "Linear Increment", 9, 6)
     # Increment Buttons(row: 1~7, +- buttons)
     print("increment buttons")
-    create_increment_buttons(root, joint_data, axes_data, increment_j_value, increment_x_value)
+    create_increment_buttons(
+        root, joint_data, axes_data, increment_j_value, increment_x_value
+    )
 
     # Run UI
     root.mainloop()
