@@ -31,6 +31,7 @@ def main(args=None):
             wait,
             DR_MV_RA_OVERRIDE,
             movel,
+            mwait,
         )
 
         from DR_common2 import posx, posb
@@ -55,6 +56,15 @@ def main(args=None):
 
     points = [point1, point2, point3, point4, point5, point6]
     movel(point1, vel=VELOCITY, acc=ACC)
+    idx = 0
+    while True:
+        print(f"move to {i}")
+        amovel(points[idx], vel=VELOCITY, acc=ACC, ra=DR_MV_RA_OVERRIDE)
+        if idx % 6 == 0:
+            mwait()
+        else:
+            wait(1.0)
+        
     for i, P in enumerate(points):
         print(f"move to {i}")
         amovel(P, vel=VELOCITY, acc=ACC, ra=DR_MV_RA_OVERRIDE)
