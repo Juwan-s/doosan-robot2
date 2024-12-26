@@ -26,6 +26,8 @@ setup(
             "simple_move=rokey.basic.move:main",
             "grip=rokey.basic.grip:main",
             "get_current_pos=rokey.basic.get_current_pos:main",
+            "simple_amove=rokey.basic.amove_test:main",
+            "simple_movesx=rokey.basic.movesx_test:main",
         ],
     },
 )
