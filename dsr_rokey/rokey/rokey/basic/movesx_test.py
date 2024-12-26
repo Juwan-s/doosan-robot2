@@ -8,7 +8,7 @@ import numpy as np
 # for single robot
 ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
-VELOCITY, ACC = 100, 100
+VELOCITY, ACC = 60, 60
 
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -50,8 +50,8 @@ def main(args=None):
     
     movej(JReady, vel=VELOCITY, acc=ACC)
 
-    points1 = [317.145, 7.384, 34.081, 109.384, 179.97, 109.228]
-    points2 = [617.81, 7.384, 34.081, 109.384, 179.97, 109.228]
+    points1 = [277.145, 7.384, 34.081, 109.384, 179.97, 109.228]
+    points2 = [707.81, 7.384, 34.081, 109.384, 179.97, 109.228]
     period = points2[0] - points1[0]
 
     x = np.arange(0, 2 * np.pi, 0.1)
@@ -69,9 +69,6 @@ def main(args=None):
         sine_list.append(posx(pos))
 
     print(len(sine_list))
-    print(sine_list)
-    for pos in sine_list:
-        movel(pos, vel=VELOCITY, acc=ACC)
     
     movesx(sine_list, vel=[100, 30], acc=[100, 60], ref=DR_BASE, vel_opt=DR_MVS_VEL_CONST)
     print("Done")
