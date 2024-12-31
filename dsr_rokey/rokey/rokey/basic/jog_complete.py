@@ -48,7 +48,7 @@ def main(args=None):
         entry.grid(row=row + 1, column=col)
         return entry
 
-    def create_position_entries(root, labels, default_values, col):
+    def create_position_entries(root, labels, default_values, col, min_val=5, max_val=50):
         data_entries = []
         for i, (label_text, default_value) in enumerate(zip(labels, default_values)):
             label = tk.Label(root, text=label_text)
@@ -60,7 +60,9 @@ def main(args=None):
                 entry.grid(row=i + 1, column=col + 1, padx=10, pady=5)
                 data_entries.append(entry)
             else:
-                entry = tk.Scale(root, from_=10, to=60, orient=tk.HORIZONTAL, length=200)
+                entry = tk.Scale(
+                    root, from_=min_val, to=max_val, orient=tk.HORIZONTAL, length=200
+                )
                 entry.set(default_value)
                 entry.grid(row=i + 1, column=col + 1, padx=10, pady=5, columnspan=3)
                 data_entries.append(entry)
@@ -105,7 +107,7 @@ def main(args=None):
             root, text="movej", command=lambda: move_by_joint(axes_data, joint_data)
         ).grid(row=9, column=1, columnspan=1, pady=10)
         tk.Button(
-            root, text="copy", command=lambda: copy_to_clipboard(root, joint_data)
+            root, text="copy", command=lambda: copy_to_clipboard(root, joint_data, "posj")
         ).grid(row=9, column=2, columnspan=1, pady=10)
 
         print("make movel button")
@@ -113,7 +115,7 @@ def main(args=None):
             root, text="movel", command=lambda: move_by_line(axes_data, joint_data)
         ).grid(row=9, column=6, columnspan=1, pady=10)
         tk.Button(
-            root, text="copy", command=lambda: copy_to_clipboard(root, axes_data)
+            root, text="copy", command=lambda: copy_to_clipboard(root, axes_data, "posx")
         ).grid(row=9, column=7, columnspan=1, pady=10)
 
         print("make grip button")
@@ -162,10 +164,12 @@ def main(args=None):
                 entries[i].delete(0, tk.END)
                 entries[i].insert(0, str(round(val, 3)))
 
-    def copy_to_clipboard(root, entries):
+    def copy_to_clipboard(root, entries, type_name):
         root.clipboard_clear()
         clipboard_text = (
-            "[" + ", ".join([str(entry.get()) for entry in entries[:6]]) + "]"
+            f"{type_name}(["
+            + ", ".join([str(entry.get()) for entry in entries[:6]])
+            + "])"
         )
         root.clipboard_append(clipboard_text)
         print(f"copy to clipboard: {clipboard_text}")
@@ -223,11 +227,13 @@ def main(args=None):
         labels=["J1", "J2", "J3", "J4", "J5", "J6", "Speed", "Acc"],
         default_values=get_current_posj() + [VELOCITY, ACC],
         col=0,
+        max_val=50,
     ), create_position_entries(
         root,
         labels=["X", "Y", "Z", "Rx", "Ry", "Rz", "Speed", "Acc"],
         default_values=get_current_posx()[0] + [VELOCITY, ACC],
         col=5,
+        max_val=100,
     )
 
     # Control Buttons(row: [0, 9, 11], grip, release, movej, movel, copy, z-axis alignment)

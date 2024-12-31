@@ -54,20 +54,24 @@ class PosTopicSubscriber(Node):
         self.text_var2 = text_var2
 
         # 토픽 구독 설정
-        self.create_subscription(Float64MultiArray, "/dsr01/msg/current_posx", self.current_posx_callback, 10)
-        self.create_subscription(Float64MultiArray, "/dsr01/msg/joint_state", self.joint_state_callback, 10)
+        self.create_subscription(
+            Float64MultiArray, "/dsr01/msg/current_posx", self.current_posx_callback, 10
+        )
+        self.create_subscription(
+            Float64MultiArray, "/dsr01/msg/joint_state", self.joint_state_callback, 10
+        )
 
     def current_posx_callback(self, msg):
         self.current_posx_msg = msg
         data = [round(d, 3) for d in self.current_posx_msg.data]
         # 텍스트 박스 업데이트 (첫 번째 텍스트 박스)
-        self.text_var1.set(f"{data}")
+        self.text_var1.set(f"posx({data})")
 
     def joint_state_callback(self, msg):
         self.joint_state_msg = msg
         data = [round(d, 3) for d in self.joint_state_msg.data]
         # 텍스트 박스 업데이트 (두 번째 텍스트 박스)
-        self.text_var2.set(f"{data}")
+        self.text_var2.set(f"posj({data})")
 
 
 def ros_thread(text_var1, text_var2):
@@ -86,11 +90,15 @@ def main():
     root = tk.Tk()
     tk.Label(root, text="current_posx:").grid(row=0, column=0)
     text_var1 = create_entries(root, 0.0, 0, 1)
-    tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, text_var1)).grid(row=0, column=3, padx=2, pady=5)
+    tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, text_var1)).grid(
+        row=0, column=3, padx=2, pady=5
+    )
 
     tk.Label(root, text="joint_state:").grid(row=1, column=0)
     text_var2 = create_entries(root, 0.0, 1, 1)
-    tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, text_var2)).grid(row=1, column=3, padx=2, pady=5)
+    tk.Button(root, text="copy", command=lambda: copy_to_clipboard(root, text_var2)).grid(
+        row=1, column=3, padx=2, pady=5
+    )
 
     # 서비스 실행
     print("Service Start")
