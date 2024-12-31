@@ -19,7 +19,7 @@ def copy_to_clipboard(root, text_box):
 def create_entries(root, default_value, row, col):
     entry_var = StringVar()
     entry_var.set(str(round(default_value, 3)))
-    entry = tk.Entry(root, textvariable=entry_var, width=40)
+    entry = tk.Entry(root, textvariable=entry_var, width=50)
     entry.grid(row=row, column=col, padx=10, pady=5)
     return entry_var
 
